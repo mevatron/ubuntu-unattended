@@ -45,6 +45,12 @@ function program_is_installed {
     echo $return_
 }
 
+PRECISE_VERSION=`wget -qO- http://releases.ubuntu.com/12.04/ | sed -n 's/.*ubuntu-\(12\.04\..*\)-server-amd64\.iso<\/a>.*/\1/p'`
+
+TRUSTY_VERSION=`wget -qO- http://releases.ubuntu.com/14.04/ | sed -n 's/.*ubuntu-\(14\.04\..*\)-server-amd64\.iso<\/a>.*/\1/p'`
+
+XENIAL_VERSION=`wget -qO- http://releases.ubuntu.com/16.04/ | sed -n 's/.*ubuntu-\(16\.04\..*\)-server-amd64\.iso<\/a>.*/\1/p'`
+
 # print a pretty header
 echo
 echo " +---------------------------------------------------+"
@@ -62,23 +68,23 @@ fi
 while true; do
     echo " which ubuntu edition would you like to remaster:"
     echo
-    echo "  [1] Ubuntu 12.04.4 LTS Server amd64 - Precise Pangolin"
-    echo "  [2] Ubuntu 14.04.4 LTS Server amd64 - Trusty Tahr"
-    echo "  [3] Ubuntu 16.04.1 LTS Server amd64 - Xenial Xerus"
+    echo "  [1] Ubuntu $PRECISE_VERSION LTS Server amd64 - Precise Pangolin"
+    echo "  [2] Ubuntu $TRUSTY_VERSION LTS Server amd64 - Trusty Tahr"
+    echo "  [3] Ubuntu $XENIAL_VERSION LTS Server amd64 - Xenial Xerus"
     echo
     read -p " please enter your preference: [1|2|3]: " ubver
     case $ubver in
-        [1]* )  download_file="ubuntu-12.04.4-server-amd64.iso"           # filename of the iso to be downloaded
+        [1]* )  download_file="ubuntu-$PRECISE_VERSION-server-amd64.iso"           # filename of the iso to be downloaded
                 download_location="http://releases.ubuntu.com/12.04/"     # location of the file to be downloaded
-                new_iso_name="ubuntu-12.04.4-server-amd64-unattended.iso" # filename of the new iso file to be created
+                new_iso_name="ubuntu-$PRECISE_VERSION-server-amd64-unattended.iso" # filename of the new iso file to be created
                 break;;
-        [2]* )  download_file="ubuntu-14.04.4-server-amd64.iso"             # filename of the iso to be downloaded
+        [2]* )  download_file="ubuntu-$TRUSTY_VERSION-server-amd64.iso"             # filename of the iso to be downloaded
                 download_location="http://releases.ubuntu.com/14.04/"     # location of the file to be downloaded
-                new_iso_name="ubuntu-14.04.4-server-amd64-unattended.iso"   # filename of the new iso file to be created
+                new_iso_name="ubuntu-$TRUSTY_VERSION-server-amd64-unattended.iso"   # filename of the new iso file to be created
                 break;;
-        [3]* )  download_file="ubuntu-16.04.1-server-amd64.iso"
+        [3]* )  download_file="ubuntu-$XENIAL_VERSION-server-amd64.iso"
                 download_location="http://releases.ubuntu.com/16.04/"
-                new_iso_name="ubuntu-16.04.1-server-amd64-unattended.iso"
+                new_iso_name="ubuntu-$XENIAL_VERSION-server-amd64-unattended.iso"
                 break;;
         * ) echo " please answer [1], [2] or [3]";;
     esac
@@ -95,7 +101,7 @@ fi
 
 # ask the user questions about his/her preferences
 read -ep " please enter your preferred timezone: " -i "${timezone}" timezone
-read -ep " please enter your preferred username: " -i "netson" username
+read -ep " please enter your preferred username: " -i "lumberjack" username
 read -sp " please enter your preferred password: " password
 printf "\n"
 read -sp " confirm your preferred password: " password2
@@ -128,7 +134,7 @@ fi
 seed_file="netson.seed"
 if [[ ! -f $tmp/$seed_file ]]; then
     echo -n " downloading $seed_file: "
-    download "https://raw.githubusercontent.com/netson/ubuntu-unattended/master/$seed_file"
+    download "https://raw.githubusercontent.com/mevatron/ubuntu-unattended/master/$seed_file"
 fi
 
 # install required packages
@@ -169,7 +175,7 @@ cd $tmp/iso_new
 echo en > $tmp/iso_new/isolinux/lang
 
 # set late command
-late_command="chroot /target wget -O /home/$username/start.sh https://github.com/netson/ubuntu-unattended/raw/master/start.sh ;\
+late_command="chroot /target wget -O /home/$username/start.sh https://github.com/mevatron/ubuntu-unattended/raw/master/start.sh ;\
     chroot /target chmod +x /home/$username/start.sh ;"
 
 # copy the netson seed file to the iso
